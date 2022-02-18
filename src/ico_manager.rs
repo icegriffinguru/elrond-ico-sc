@@ -3,7 +3,6 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const EGLD_IN_WEI: BigUint = 1_000_000_000_000_000_000;
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Clone, Copy, Debug)]
 pub enum Status {
@@ -71,22 +70,22 @@ pub trait IcoManager {
 
         let caller = self.blockchain().get_caller();
         
-        &self.send().direct(&caller, &TokenIdentifier::egld(), 0, &balance, &[]);
+        self.send().direct(&caller, &TokenIdentifier::egld(), 0, &balance, &[]);
 
         Ok(())
     }
 
     // withdraw ESDT
     #[only_owner]
-    #[endpoint(withdraw)]
-    fn withdrawEsdt(&self, amount: BigUint) -> SCResult<()> {
+    #[endpoint(withdrawEsdt)]
+    fn withdraw_esdt(&self, amount: BigUint) -> SCResult<()> {
         let token_id = self.token_id().get();
         let balance = self.blockchain().get_sc_balance(&token_id, 0);
         require!(amount <= balance, "not enough esdt");
 
         let caller = self.blockchain().get_caller();
         
-        &self.send().direct(&caller, &token_id, 0, &balance, &[]);
+        self.send().direct(&caller, &token_id, 0, &balance, &[]);
 
         Ok(())
     }
@@ -97,7 +96,7 @@ pub trait IcoManager {
     #[endpoint(buyTokens)]
     fn buy_tokens(&self, #[payment_amount] paid_amount: BigUint) -> SCResult<()> {
         self.require_activation();
-        require!(paid_amount != 0, "you sent 0 EGLD");
+        require!(paid_amount != 0u64, "you sent 0 EGLD");
 
         if !self.buy_limit().is_empty() {
             require!(paid_amount <= self.buy_limit().get(), "buy limit exceeded");
@@ -108,7 +107,7 @@ pub trait IcoManager {
         let token_price = self.token_price().get();
         let available_token_amount = self.blockchain().get_sc_balance(&token_id, 0);
 
-        let token_amount = &paid_amount / &token_price * EGLD_IN_WEI;
+        let token_amount = &paid_amount * &BigUint::from(1_000_000_000_000_000_000u64) / &token_price;
         require!(token_amount <= available_token_amount, "not enough tokens available");
 
         self.send().direct(&caller, &token_id, 0, &token_amount, &[]);
@@ -151,7 +150,7 @@ pub trait IcoManager {
     fn token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     // buy_limit in EGLD
-    #[view(getTokenAvailable)]
+    #[view(getBuyLimit)]
     #[storage_mapper("buy_limit")]
     fn buy_limit(&self) -> SingleValueMapper<BigUint>;
 

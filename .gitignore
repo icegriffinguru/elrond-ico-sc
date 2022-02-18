@@ -9,3 +9,4 @@ Cargo.lock
 
 # The erdpy output
 output
+*.interaction.json

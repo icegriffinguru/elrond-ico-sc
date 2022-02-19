@@ -8,9 +8,9 @@ elrond_wasm_node::wasm_endpoints! {
     elrond_ico_sc
     (
         buyTokens
-        getActivationTimestamp
         getBuyLimit
         getDurationTimestamp
+        getStartTime
         getTokenAvailable
         getTokenId
         getTokenPrice

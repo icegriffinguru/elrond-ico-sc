@@ -33,14 +33,14 @@ pub trait IcoManager {
 
     #[only_owner]
     #[endpoint(updateTimes)]
-    fn update_times(&self, activation_timestamp: u64, duration_timestamp: u64) -> SCResult<()> {
+    fn update_times(&self, start_time: u64, end_time: u64) -> SCResult<()> {
         require!(
-            activation_timestamp > self.blockchain().get_block_timestamp(),
-            "activation_timestamp can't be in the past"
+            start_time > self.blockchain().get_block_timestamp(),
+            "start_time can't be in the past"
         );
 
-        self.activation_timestamp().set(activation_timestamp);
-        self.duration_timestamp().set(duration_timestamp);
+        self.start_time().set(start_time);
+        self.end_time().set(end_time);
 
         Ok(())
     }
@@ -117,9 +117,9 @@ pub trait IcoManager {
 
     #[view]
     fn status(&self) -> Status {
-        if self.blockchain().get_block_timestamp() < self.activation_timestamp().get() {
+        if self.blockchain().get_block_timestamp() < self.start_time().get() {
             Status::NotStarted
-        } else if self.blockchain().get_block_timestamp() < self.activation_timestamp().get() + self.duration_timestamp().get(){
+        } else if self.blockchain().get_block_timestamp() < self.end_time().get(){
             Status::Started
         } else {
             Status::Ended
@@ -135,12 +135,12 @@ pub trait IcoManager {
     /// private functions ///
     
     fn require_activation(&self) {
-        let starting_timestamp = self.activation_timestamp().get();
-        let duration_timestamp = self.duration_timestamp().get();
+        let starting_timestamp = self.start_time().get();
+        let end_time = self.end_time().get();
         let current_timestamp = self.blockchain().get_block_timestamp();
 
         require!(current_timestamp >= starting_timestamp, "ICO is not started.");
-        require!(current_timestamp < starting_timestamp + duration_timestamp, "ICO is finished.");
+        require!(current_timestamp < end_time, "ICO is finished.");
     }
 
     /// storage ///
@@ -159,11 +159,11 @@ pub trait IcoManager {
     #[storage_mapper("token_price")]
     fn token_price(&self) -> SingleValueMapper<BigUint>;
 
-    #[view(getActivationTimestamp)]
-    #[storage_mapper("activation_timestamp")]
-    fn activation_timestamp(&self) -> SingleValueMapper<u64>;
+    #[view(getStartTime)]
+    #[storage_mapper("start_time")]
+    fn start_time(&self) -> SingleValueMapper<u64>;
 
     #[view(getDurationTimestamp)]
-    #[storage_mapper("duration_timestamp")]
-    fn duration_timestamp(&self) -> SingleValueMapper<u64>;
+    #[storage_mapper("end_time")]
+    fn end_time(&self) -> SingleValueMapper<u64>;
 }

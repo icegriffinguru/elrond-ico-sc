@@ -13,7 +13,9 @@
             "pem": "./wallets/testnet-wallet.pem",
             "gas-limit": 59999999,
             "send": true,
-            "outfile": "deploy-testnet.interaction.json"
+            "outfile": "deploy-testnet.interaction.json",
+            "metadata-payable": true,
+            "metadata-payable-by-sc": true
         }
      }
 }

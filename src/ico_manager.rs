@@ -92,7 +92,7 @@ pub trait IcoManager {
 
     /// endpoint ///
     
-    #[payable(*)]
+    #[payable("*")]
     #[endpoint(buyTokens)]
     fn buy_tokens(&self, #[payment_amount] paid_amount: BigUint) -> SCResult<()> {
         self.require_activation();

@@ -92,7 +92,7 @@ pub trait IcoManager {
 
     /// endpoint ///
     
-    #[payable("EGLD")]
+    #[payable(*)]
     #[endpoint(buyTokens)]
     fn buy_tokens(&self, #[payment_amount] paid_amount: BigUint) -> SCResult<()> {
         self.require_activation();
@@ -163,7 +163,7 @@ pub trait IcoManager {
     #[storage_mapper("start_time")]
     fn start_time(&self) -> SingleValueMapper<u64>;
 
-    #[view(getDurationTimestamp)]
+    #[view(getEndTime)]
     #[storage_mapper("end_time")]
     fn end_time(&self) -> SingleValueMapper<u64>;
 }

@@ -9,7 +9,7 @@ elrond_wasm_node::wasm_endpoints! {
     (
         buyTokens
         getBuyLimit
-        getDurationTimestamp
+        getEndTime
         getStartTime
         getTokenAvailable
         getTokenId
